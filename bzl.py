@@ -48,39 +48,49 @@ if len(lines) == 1:
     fruits = lines[0].split()
     process_line(ws, fruits, last_column, font, alignment)
 
-# 如果文件有三行或者五行
+# 如果文件有三行或者五行或者其他5的倍数行
 elif len(lines) >= 3:
-    # 处理前三行
-    cell1 = ws.cell(row=3, column=last_column, value=lines[0].strip())
-    cell1.font = font
-    cell1.alignment = alignment
+    # 将文件拆分成多个五行进行处理
+    for i in range(0, len(lines), 5):
+        chunk = lines[i:i+5]
+        # 处理前三行或者只有一行的情况
+        cell1 = ws.cell(row=3, column=last_column, value=chunk[0].strip())
+        cell1.font = font
+        cell1.alignment = alignment
 
-    cell2 = ws.cell(row=4, column=last_column, value=lines[2].strip())
-    cell2.font = font
-    cell2.alignment = alignment
+        if len(chunk) > 1:
+            cell2 = ws.cell(row=4, column=last_column, value=chunk[2].strip())
+            cell2.font = font
+            cell2.alignment = alignment
 
-    # 对第二行进行split，并调用process_line函数处理
-    fruits = lines[1].split()
-    process_line(ws, fruits, last_column, font, alignment)
+            # 对第二行进行split，并调用process_line函数处理
+            fruits = chunk[1].split()
+            process_line(ws, fruits, last_column, font, alignment)
 
-    if len(lines) >= 5:
-        # 处理第四行和第五行
+        if len(chunk) > 3:
+            # 处理第四行和第五行
+            last_column += 1
+
+            cell3 = ws.cell(row=3, column=last_column, value=chunk[3].strip())
+            cell3.font = font
+            cell3.alignment = alignment
+
+            # 对第五行进行split，并调用process_line函数处理
+            fruits = chunk[4].split()
+            process_line(ws, fruits, last_column, font, alignment)
+
         last_column += 1
 
-        cell3 = ws.cell(row=3, column=last_column, value=lines[3].strip())
-        cell3.font = font
-        cell3.alignment = alignment
-
-        # 对第五行进行split，并调用process_line函数处理
-        fruits = lines[4].split()
-        process_line(ws, fruits, last_column, font, alignment)
-
-# 设置所有列的宽度为20，所有行的高度为10
+# 设置所有列的宽度为20，所有行的高度为10，从第四行开始统计每一行非空的数量（不包括第一列）
 for i in range(1, ws.max_column + 1):
-    ws.column_dimensions[get_column_letter(i)].width = 10
+    ws.column_dimensions[get_column_letter(i)].width = 20
 
-for row in ws.iter_rows():
-    ws.row_dimensions[row[0].row].height = 13
+for i in range(1, ws.max_row + 1):
+    ws.row_dimensions[i].height = 10
+
+for i in range(4, ws.max_row + 1):
+    count = sum(1 for cell in ws[i] if cell.value is not None and cell.column_letter != 'A')
+    ws.cell(row=i, column=2, value=count)
 
 # 保存更改后的Excel文件
 wb.save('fruits.xlsx')
