@@ -34,7 +34,7 @@ font = Font(name='微软雅黑', size=8)
 alignment = Alignment(horizontal='center', vertical='top', wrap_text=True)
 
 # 读取文本文件，使用utf-8编码
-with open('fruits.txt', 'r', encoding='utf-8') as file:
+with open('bzl.txt', 'r', encoding='utf-8') as file:
     lines = file.readlines()
 
 # 过滤掉空行
@@ -68,18 +68,19 @@ elif len(lines) >= 3:
             # 处理第四行和第五行
             last_column += 1
             celln3 = ws.cell(row=1, column=last_column, value=chunk[3].strip()[-6:-1])
-            cell3 = ws.cell(row=3, column=last_column, value=chunk[3].strip())
+            cell3 = ws.cell(row=2, column=last_column, value=chunk[3].strip())
 
             # 对第五行进行split，并调用process_line函数处理
             fruits = chunk[4].split()
             process_line(ws, fruits, last_column, font, alignment)
 
         last_column += 1
-
+# count
 for i in range(4, ws.max_row + 1):
     count = sum(1 for cell in ws[i][3:] if cell.value is not None)
     ws.cell(row=i, column=2, value=count)
 
 css(ws)
+
 # 保存更改后的Excel文件
 wb.save('fruits.xlsx')
