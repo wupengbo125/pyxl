@@ -1,8 +1,9 @@
 from openpyxl import load_workbook
 from openpyxl.styles import Alignment, Font, PatternFill
+from openpyxl.utils import get_column_letter
 from css import css
 # 加载工作簿和工作表
-wb = load_workbook('your_file.xlsx')
+wb = load_workbook('fruits.xlsx')
 ws = wb.active
 
 # 参数列表
@@ -10,7 +11,7 @@ params = ['param1', 'param2', 'param3']  # 你可以根据需要修改这个列�
 
 # 从第4行第3列开始搜索
 start_row = 4
-start_col = 3
+start_col = 4
 
 # 需要删除的列
 cols_to_delete = []
@@ -35,7 +36,7 @@ for col in sorted(cols_to_delete, reverse=True):
     ws.delete_cols(col)
 
 # 创建新的工作表并将数据复制过去
-new_ws = wb.create_sheet(title='New Sheet')
+new_ws = wb.create_sheet(title=" ".join(params))
 for row in ws.iter_rows(values_only=True):
     new_ws.append(row)
 
