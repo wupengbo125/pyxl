@@ -1,5 +1,5 @@
 from openpyxl import load_workbook
-from openpyxl.styles import Font, Alignment
+from openpyxl.styles import Alignment, Font, PatternFill
 from openpyxl.utils import get_column_letter
 
 def css(ws):
@@ -11,8 +11,6 @@ def css(ws):
             cell.font = font
             cell.alignment = alignment
 
-    
-    
     # 设置第一行奇数列为红色，偶数列为绿色
     red_fill = PatternFill(start_color="FF9999", end_color="FF9999", fill_type="solid")
     green_fill = PatternFill(start_color="a4c2b7", end_color="a4c2b7", fill_type="solid")
