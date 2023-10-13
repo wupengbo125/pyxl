@@ -1,6 +1,7 @@
 from openpyxl import load_workbook
 from openpyxl.styles import Font, Alignment
 from openpyxl.utils import get_column_letter
+from css import css
 
 # 定义一个函数来处理特定的行
 def process_line(ws, fruits, last_column, font, alignment):
@@ -30,7 +31,7 @@ ws = wb.active
 font = Font(name='微软雅黑', size=8)
 
 # 创建一个Alignment对象，设置文本居中显示和自动换行
-alignment = Alignment(horizontal='center', vertical='center', wrap_text=True)
+alignment = Alignment(horizontal='center', vertical='top', wrap_text=True)
 
 # 读取文本文件，使用utf-8编码
 with open('fruits.txt', 'r', encoding='utf-8') as file:
@@ -54,15 +55,11 @@ elif len(lines) >= 3:
     for i in range(0, len(lines), 5):
         chunk = lines[i:i+5]
         # 处理前三行或者只有一行的情况
-        cell1 = ws.cell(row=3, column=last_column, value=chunk[0].strip())
-        cell1.font = font
-        cell1.alignment = alignment
+        cell0 = ws.cell(row=1, column=last_column, value=chunk[0].strip()[-6:-1])
+        cell1 = ws.cell(row=2, column=last_column, value=chunk[0].strip())
 
         if len(chunk) > 1:
-            cell2 = ws.cell(row=4, column=last_column, value=chunk[2].strip())
-            cell2.font = font
-            cell2.alignment = alignment
-
+            cell2 = ws.cell(row=3, column=last_column, value=chunk[2].strip())
             # 对第二行进行split，并调用process_line函数处理
             fruits = chunk[1].split()
             process_line(ws, fruits, last_column, font, alignment)
@@ -70,10 +67,8 @@ elif len(lines) >= 3:
         if len(chunk) > 3:
             # 处理第四行和第五行
             last_column += 1
-
+            celln3 = ws.cell(row=1, column=last_column, value=chunk[3].strip()[-6:-1])
             cell3 = ws.cell(row=3, column=last_column, value=chunk[3].strip())
-            cell3.font = font
-            cell3.alignment = alignment
 
             # 对第五行进行split，并调用process_line函数处理
             fruits = chunk[4].split()
@@ -81,16 +76,10 @@ elif len(lines) >= 3:
 
         last_column += 1
 
-# 设置所有列的宽度为20，所有行的高度为10，从第四行开始统计每一行非空的数量（不包括第一列）
-for i in range(1, ws.max_column + 1):
-    ws.column_dimensions[get_column_letter(i)].width = 20
-
-for i in range(1, ws.max_row + 1):
-    ws.row_dimensions[i].height = 10
-
 for i in range(4, ws.max_row + 1):
-    count = sum(1 for cell in ws[i] if cell.value is not None and cell.column_letter != 'A')
+    count = sum(1 for cell in ws[i][3:] if cell.value is not None)
     ws.cell(row=i, column=2, value=count)
 
+css(ws)
 # 保存更改后的Excel文件
 wb.save('fruits.xlsx')
