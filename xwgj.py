@@ -16,7 +16,7 @@ for row in range(1, sheet.max_row + 1):
         cell = sheet.cell(row=row, column=3)
         cell.value = text
         # 设置wraptext为true
-        cell.alignment = Alignment(wrap_text=True, vertical='top', horizontal='center')
+        cell.alignment = Alignment(wrap_text=True, vertical='top')
         # 设置字体为微软雅黑，字号为8
         cell.font = Font(name='微软雅黑', size=8)
 
