@@ -2,6 +2,24 @@ from openpyxl import load_workbook
 from openpyxl.styles import Font, Alignment
 from openpyxl.utils import get_column_letter
 from css import css
+import argparse
+
+# 放心大胆的用，该方法很强大，能处理单行药方，双行说明加药方，三行说明加药方加说明，五行三行加替代方加药方。5n行，
+count_start_line = 5
+count_start_column = 4
+jfnamefrom = -6 # 数据源的最后几个字是经方名字吗？从哪开始
+jfnameend = -1 # 从哪结束
+jfname_line = 1 # 经方名放在第几行
+question_line = 2 # 人有
+jfexplain_line = 3 # 盖
+label_line = 4 # label
+
+# 创建ArgumentParser对象
+parser = argparse.ArgumentParser(description="Add a parameter to the fourth row of each new column.")
+parser.add_argument("parameter", nargs='?', default='', help="The parameter to add to the fourth row of each new column.")
+
+# 解析命令行参数
+args = parser.parse_args()
 
 # 定义一个函数来处理特定的行
 def process_line(ws, fruits, last_column, font, alignment):
@@ -48,27 +66,47 @@ if len(lines) == 1:
     # 对这一行进行split，并调用process_line函数处理
     fruits = lines[0].split()
     process_line(ws, fruits, last_column, font, alignment)
+    # 在第四行添加参数的值
+    if args.parameter:
+        ws.cell(row=label_line, column=last_column, value=args.parameter)
+elif len(lines) == 2:
+    # 处理the 1st line
+    cell1 = ws.cell(row=jfname_line, column=last_column, value=lines[0].strip()[jfnamefrom:jfnameend])
+    cell1 = ws.cell(row=question_line, column=last_column, value=lines[0].strip())
 
+    # 对第2行进行split，并调用process_line函数处理
+    fruits = lines[1].split()
+    process_line(ws, fruits, last_column, font, alignment)
+    # 在第四行添加参数的值
+    if args.parameter:
+        ws.cell(row=label_line, column=last_column, value=args.parameter)
 # 如果文件有三行或者五行或者其他5的倍数行
 elif len(lines) >= 3:
     # 将文件拆分成多个五行进行处理
     for i in range(0, len(lines), 5):
         chunk = lines[i:i+5]
         # 处理前三行或者只有一行的情况
-        cell0 = ws.cell(row=1, column=last_column, value=chunk[0].strip()[-6:-1])
-        cell1 = ws.cell(row=2, column=last_column, value=chunk[0].strip())
+        cell0 = ws.cell(row=jfname_line, column=last_column, value=chunk[0].strip()[jfnamefrom:jfnameend])
+        cell1 = ws.cell(row=question_line, column=last_column, value=chunk[0].strip())
 
         if len(chunk) > 1:
             cell2 = ws.cell(row=3, column=last_column, value=chunk[2].strip())
             # 对第二行进行split，并调用process_line函数处理
             fruits = chunk[1].split()
             process_line(ws, fruits, last_column, font, alignment)
+            # 在第四行添加参数的值
+            if args.parameter:
+                ws.cell(row=label_line, column=last_column, value=args.parameter)
 
         if len(chunk) > 3:
             # 处理第四行和第五行
             last_column += 1
-            celln3 = ws.cell(row=1, column=last_column, value=chunk[3].strip()[-6:-1])
-            cell3 = ws.cell(row=2, column=last_column, value=chunk[3].strip())
+            celln3 = ws.cell(row=jfname_line, column=last_column, value=chunk[3].strip()[jfnamefrom:jfnameend])
+            cell3 = ws.cell(row=question_line, column=last_column, value=chunk[3].strip())
+
+            # 在第四行添加参数的值
+            if args.parameter:
+                ws.cell(row=label_line, column=last_column, value=args.parameter)
 
             # 对第五行进行split，并调用process_line函数处理
             fruits = chunk[4].split()
@@ -76,8 +114,8 @@ elif len(lines) >= 3:
 
         last_column += 1
 # count
-for i in range(4, ws.max_row + 1):
-    count = sum(1 for cell in ws[i][3:] if cell.value is not None)
+for i in range(count_start_line, ws.max_row + 1):
+    count = sum(1 for cell in ws[i][count_start_column-1:] if cell.value is not None)
     ws.cell(row=i, column=2, value=count)
 
 css(ws)

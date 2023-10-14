@@ -26,12 +26,9 @@ def css(ws):
     for row in ws.iter_rows(min_row=2, max_row=3):
         for cell in row:
             cell.font = font
-            
+
     # 设置所有行宽为10，高为13
-    for column_cells in ws.columns:
-        max_length = 10
-        column = column_cells[0].column_letter
-        ws.column_dimensions[column].width = max_length
-
-    ws.row_dimensions[1].height = 13
-
+    for i in range(1,ws.max_column +1):
+        ws.column_dimensions[get_column_letter(i)].width = 10
+    for i in range(1,ws.max_row + 1):
+        ws.row_dimensions[i].height = 13
