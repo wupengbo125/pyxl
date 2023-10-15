@@ -64,7 +64,7 @@ last_column = ws.max_column + 1
 # 如果文件只有一行，将这一行视为三行模式下的第二行进行处理
 if len(lines) == 1:
     # 对这一行进行split，并调用process_line函数处理
-    fruits = lines[0].split()
+    fruits = lines[0].split('，')
     process_line(ws, fruits, last_column, font, alignment)
     # 在第四行添加参数的值
     if args.parameter:
@@ -75,7 +75,7 @@ elif len(lines) == 2:
     cell1 = ws.cell(row=question_line, column=last_column, value=lines[0].strip())
 
     # 对第2行进行split，并调用process_line函数处理
-    fruits = lines[1].split()
+    fruits = lines[1].split('，')
     process_line(ws, fruits, last_column, font, alignment)
     # 在第四行添加参数的值
     if args.parameter:
@@ -92,7 +92,7 @@ elif len(lines) >= 3:
         if len(chunk) > 1:
             cell2 = ws.cell(row=3, column=last_column, value=chunk[2].strip())
             # 对第二行进行split，并调用process_line函数处理
-            fruits = chunk[1].split()
+            fruits = chunk[1].split('，')
             process_line(ws, fruits, last_column, font, alignment)
             # 在第四行添加参数的值
             if args.parameter:
@@ -109,7 +109,7 @@ elif len(lines) >= 3:
                 ws.cell(row=label_line, column=last_column, value=args.parameter)
 
             # 对第五行进行split，并调用process_line函数处理
-            fruits = chunk[4].split()
+            fruits = chunk[4].split('，')
             process_line(ws, fruits, last_column, font, alignment)
 
         last_column += 1
