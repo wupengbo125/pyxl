@@ -47,3 +47,37 @@ def sendXmattersMessage(String message) {
     // 实际发送消息的逻辑...
     println("Sending Xmatters message: ${message}")
 }
+
+
+
+
+pipeline {
+    agent any
+    // ... 省略其他阶段的定义 ...
+
+    post {
+        always {
+            // 无论构建成功还是失败，都执行发送消息
+            sendXmattersMessage(currentBuild.currentResult)
+        }
+    }
+}
+
+// 定义发送Xmatters消息的方法
+def sendXmattersMessage(String buildResult) {
+    // 假设Xmatters的API端点
+    def xmattersApiEndpoint = 'https://your-xmatters-instance/api/integration/1/functions/{function-id}/triggers'
+    def xmattersApiKey = 'your-xmatters-api-key' // 这应该是你的Xmatters API密钥
+    def message = (buildResult == 'SUCCESS') ? 'success' : 'fail'
+
+    // 构建发送到Xmatters的JSON负载
+    def jsonPayload = "{\"properties\":{\"message\":\"${message}\",\"buildResult\":\"${buildResult}\"}}"
+
+    // 调用curl发送消息
+    sh """
+    curl -X POST "$xmattersApiEndpoint" \
+         -H 'Content-Type: application/json' \
+         -H 'Authorization: Bearer $xmattersApiKey' \
+         -d '$jsonPayload'
+    """
+}
