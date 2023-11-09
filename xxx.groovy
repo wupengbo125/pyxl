@@ -81,3 +81,19 @@ def sendXmattersMessage(String buildResult) {
          -d '$jsonPayload'
     """
 }
+pipeline {
+    // ... your pipeline stages
+    post {
+        success {
+            sh """
+            curl -X POST -u username:password --data-urlencode "text=Build Successful: ${env.JOB_NAME} ${env.BUILD_NUMBER}" http://your.xmatter.http.endpoint
+            """
+        }
+        failure {
+            sh """
+            curl -X POST -u username:password --data-urlencode "text=Build Failed: ${env.JOB_NAME} ${env.BUILD_NUMBER}" http://your.xmatter.http.endpoint
+            """
+        }
+    }
+}
+
