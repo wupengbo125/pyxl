@@ -1,4 +1,9 @@
- pipeline {
+curl -X POST 'https://if_apiasdfffdgt.api/alertapi_baseauth?aboutSource=GCP' \
+     -H 'Content-Type: application/json' \
+     -d '{"message": "Your message here"}' \
+     --user f0851c1:2e43FE5
+
+pipeline {
     agent any
 
     stages {
